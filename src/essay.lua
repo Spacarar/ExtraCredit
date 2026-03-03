@@ -2975,11 +2975,20 @@ SMODS.Back{ --Archeology Deck
 	pos = { x = 1, y = 0 },
 	atlas = "ECother",
   apply = function(self, back)
-    ease_ante(-1)
-    G.GAME.round_resets.blind_ante = G.GAME.round_resets.blind_ante or G.GAME.round_resets.ante
-    G.GAME.round_resets.blind_ante = G.GAME.round_resets.blind_ante - 1
+    -- applying starting hand size before deck is created is okay
     G.GAME.starting_params.hand_size = G.GAME.starting_params.hand_size - 1
-  end
+
+    -- then wait till the game starts and immediately move back 1 blind (prevents crash)
+    G.E_MANAGER:add_event(Event({
+        trigger = 'immediate',
+        func = function()
+            ease_ante(-1)
+            G.GAME.round_resets.blind_ante = G.GAME.round_resets.blind_ante or G.GAME.round_resets.ante
+            G.GAME.round_resets.blind_ante = G.GAME.round_resets.blind_ante - 1
+            return true
+        end
+    }))
+end
 }
 
 SMODS.Back{ --Echo Deck
